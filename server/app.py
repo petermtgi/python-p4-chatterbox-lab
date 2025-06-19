@@ -41,7 +41,7 @@ def messages_by_id(id):
     elif request.method == 'DELETE':
         db.session.delete(message)
         db.session.commit()
-        return make_response(jsonify({'deleted': True}), 200)
+        return '', 204 
 
 if __name__ == '__main__':
     app.run(debug=True)
