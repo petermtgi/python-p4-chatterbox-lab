@@ -1,6 +1,6 @@
 # server/testing/app_test.py
 
-from datetime import datetime
+from datetime import datetime, UTC
 from app import app, db
 from models import Message
 
@@ -12,13 +12,12 @@ def clear_db():
         Message.query.delete()
         db.session.commit()
 
-
 def test_has_correct_columns():
     with app.app_context():
         msg = Message(
             body="Hello 👋",
             username="Liza",
-            updated_at=datetime.utcnow()
+            updated_at=datetime.now(UTC)
         )
         db.session.add(msg)
         db.session.commit()
@@ -27,10 +26,9 @@ def test_has_correct_columns():
         assert msg.username == "Liza"
         assert isinstance(msg.created_at, datetime)
 
-
 def test_returns_list_of_json_objects_for_all_messages_in_database():
     with app.app_context():
-        msg1 = Message(body="Hello 👋", username="Liza", updated_at=datetime.utcnow())
+        msg1 = Message(body="Hello 👋", username="Liza", updated_at=datetime.now(UTC))
         db.session.add(msg1)
         db.session.commit()
 
@@ -42,7 +40,6 @@ def test_returns_list_of_json_objects_for_all_messages_in_database():
             assert message['id'] in [record.id for record in records]
             assert message['body'] in [record.body for record in records]
 
-
 def test_creates_new_message_in_the_database():
     with app.app_context():
         response = app.test_client().post(
@@ -53,7 +50,6 @@ def test_creates_new_message_in_the_database():
         assert response.status_code == 201
         h = Message.query.filter_by(body="Hello 👋").first()
         assert h
-
 
 def test_returns_data_for_newly_created_message_as_json():
     with app.app_context():
@@ -67,10 +63,9 @@ def test_returns_data_for_newly_created_message_as_json():
         assert response.json["body"] == "Hello 👋"
         assert response.json["username"] == "Liza"
 
-
 def test_updates_body_of_message_in_database():
     with app.app_context():
-        msg = Message(body="Old Text", username="Liza", updated_at=datetime.utcnow())
+        msg = Message(body="Old Text", username="Liza", updated_at=datetime.now(UTC))
         db.session.add(msg)
         db.session.commit()
 
@@ -83,10 +78,9 @@ def test_updates_body_of_message_in_database():
         updated_msg = Message.query.get(msg.id)
         assert updated_msg.body == "New Text"
 
-
 def test_returns_data_for_updated_message_as_json():
     with app.app_context():
-        msg = Message(body="Before", username="Liza", updated_at=datetime.utcnow())
+        msg = Message(body="Before", username="Liza", updated_at=datetime.now(UTC))
         db.session.add(msg)
         db.session.commit()
 
@@ -98,10 +92,9 @@ def test_returns_data_for_updated_message_as_json():
         assert response.status_code == 200
         assert response.json["body"] == "After"
 
-
 def test_deletes_message_from_database():
     with app.app_context():
-        msg = Message(body="Delete Me", username="Liza", updated_at=datetime.utcnow())
+        msg = Message(body="Delete Me", username="Liza", updated_at=datetime.now(UTC))
         db.session.add(msg)
         db.session.commit()
 
